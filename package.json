@@ -1,0 +1,22 @@
+{
+  "name": "red-eared-slider-journal",
+  "version": "1.0.0",
+  "description": "Red-Eared Slider (Trachemys scripta elegans) Care & Habitat Telemetry Journal",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 .",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod"
+  },
+  "keywords": [
+    "turtle",
+    "red-eared-slider",
+    "herpetology",
+    "habitat-telemetry",
+    "obsidian-sync",
+    "vercel"
+  ],
+  "author": "Operator",
+  "license": "MIT"
+}

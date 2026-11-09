@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trachemys Journal | Red-Eared Slider Telemetry & Field Vault</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            sliderRed: '#ef4444',
+            turtleGreen: '#10b981',
+            turtleAmber: '#f59e0b',
+            waterCyan: '#06b6d4',
+            darkBg: '#090d0b',
+            cardBg: '#111a15',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#090d0b] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="border-b border-emerald-950/60 bg-[#0c1410]/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand & Species -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-red-500/20 border border-emerald-500/30 flex items-center justify-center relative overflow-hidden">
+          <i data-lucide="shield" class="w-5 h-5 text-emerald-400"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              Trachemys Journal
+              <span class="text-xs px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 border border-red-500/30 font-mono">RES-01</span>
+            </h1>
+          </div>
+          <p class="text-xs text-slate-400 font-mono">
+            Trachemys scripta elegans &bull; <span id="current-time">2026-11-09</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-3">
+        <button id="btn-export-obsidian" class="hidden sm:inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/40 text-purple-300 text-xs font-mono transition-colors">
+          <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
+          <span>Obsidian Sync</span>
+        </button>
+
+        <button id="btn-quick-log" class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all hover:scale-105 active:scale-95">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Log Observation</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- TURTLE ROSTER / PROFILES -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-mono uppercase tracking-wider text-emerald-400/90 flex items-center gap-2">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          Registered Animals &amp; Frames
+        </h2>
+        <span class="text-xs text-slate-400 font-mono">Vault Area: 91_OBSIDIAN/journals</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Turbo Card -->
+        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-emerald-500/50 transition" onclick="filterByTurtle('Turbo')">
+          <div class="flex justify-between items-start pl-2">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">Turbo</span>
+              <h3 class="text-base font-bold text-white mt-1">Turbo The Turtle</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-TRB-001 &bull; Adult Female</p>
+            </div>
+            <div class="w-3 h-3 rounded-full bg-emerald-500 status-pulse"></div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
+            <div>
+              <span class="text-slate-500 block text-[10px]">DIET</span>
+              <span id="turbo-last-diet">Pellets + Kale</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
+              <span id="turbo-last-log">Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sneaky Card -->
+        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-amber-500/50 transition" onclick="filterByTurtle('Sneaky')">
+          <div class="flex justify-between items-start pl-2">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950/60 text-amber-400 border border-amber-500/30">Sneaky</span>
+              <h3 class="text-base font-bold text-white mt-1">Sneaky</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-SNK-001 &bull; 36 Titles</p>
+            </div>
+            <div class="w-3 h-3 rounded-full bg-amber-500 status-pulse"></div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
+            <div>
+              <span class="text-slate-500 block text-[10px]">DIET</span>
+              <span id="sneaky-last-diet">Duckweed</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
+              <span id="sneaky-last-log">Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Night-Tank Frame Card -->
+        <div class="glass-panel rounded-xl p-4 relative border border-slate-800/80 cursor-pointer hover:border-slate-600 transition" onclick="filterByTurtle('Unassigned')">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">Frame Frame</span>
+              <h3 class="text-base font-bold text-slate-200 mt-1">Night-Tank Frame</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-NGT-001 &bull; Unassigned</p>
+            </div>
+            <i data-lucide="camera" class="w-4 h-4 text-slate-500"></i>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 text-xs font-mono text-slate-400">
+            <span class="text-slate-500 block text-[10px]">RECORD RULE</span>
+            <span>Awaiting visual observation tag</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HABITAT TELEMETRY DASHBOARD -->
+    <section class="glass-panel rounded-xl p-5 space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-emerald-950/40 pb-3">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+          <h2 class="text-sm font-semibold tracking-wide text-white uppercase font-mono">Habitat Telemetry Sensors</h2>
+        </div>
+        <div class="flex items-center space-x-4 text-xs font-mono text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Optimal Zone</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Attention Needed</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Water Temperature -->
+        <div class="bg-[#0b1310]/90 border border-emerald-900/30 rounded-lg p-3.5 space-y-2">
+          <div class="flex justify-between text-xs font-mono text-slate-400">
+            <span>WATER TEMP</span>
+            <span class="text-emerald-400">76°F Target</span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="telemetry-water-temp" class="text-2xl font-bold font-mono text-emerald-400">76.4°</span>
+            <span class="text-xs text-slate-400 font-mono">Fahrenheit</span>
+          </div>
+          <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-gradient-to-r from-cyan-500 to-emerald-500 h-1.5 rounded-full" style="width: 76%"></div>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono block">Safe Range: 74°F – 78°F</span>
+        </div>
+
+        <!-- Basking Temperature -->
+        <div class="bg-[#0b1310]/90 border border-emerald-900/30 rounded-lg p-3.5 space-y-2">
+          <div class="flex justify-between text-xs font-mono text-slate-400">
+            <span>BASKING TEMP</span>
+            <span class="text-amber-400">92°F Target</span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="telemetry-basking-temp" class="text-2xl font-bold font-mono text-amber-400">91.8°</span>
+            <span class="text-xs text-slate-400 font-mono">Fahrenheit</span>
+          </div>
+          <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-500 to-red-500 h-1.5 rounded-full" style="width: 88%"></div>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono block">Safe Range: 88°F – 95°F</span>
+        </div>
+
+        <!-- Water Chemistry (pH / Ammonia) -->
+        <div class="bg-[#0b1310]/90 border border-emerald-900/30 rounded-lg p-3.5 space-y-2">
+          <div class="flex justify-between text-xs font-mono text-slate-400">
+            <span>WATER pH / AMM</span>
+            <span class="text-cyan-400">Clean</span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="telemetry-ph" class="text-2xl font-bold font-mono text-cyan-400">7.6</span>
+            <span class="text-xs text-slate-400 font-mono">pH &bull; 0 ppm NH3</span>
+          </div>
+          <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-cyan-500 h-1.5 rounded-full" style="width: 65%"></div>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono block">pH Target: 7.4 – 8.0</span>
+        </div>
+
+        <!-- UVB Bulb Life -->
+        <div class="bg-[#0b1310]/90 border border-emerald-900/30 rounded-lg p-3.5 space-y-2">
+          <div class="flex justify-between text-xs font-mono text-slate-400">
+            <span>UVB 5.0 BULB</span>
+            <span class="text-emerald-400">Active</span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="telemetry-uvb-days" class="text-2xl font-bold font-mono text-purple-400">142</span>
+            <span class="text-xs text-slate-400 font-mono">Days Left</span>
+          </div>
+          <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-purple-500 h-1.5 rounded-full" style="width: 78%"></div>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono block">6-Month Swap Protocol</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTRIES LOG & OBSERVATIONS -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+          <h2 class="text-sm font-semibold tracking-wide text-white uppercase font-mono">Journal Entries &amp; Care Logs</h2>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex items-center space-x-1.5 bg-[#0e1713] p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <button onclick="filterByTurtle('All')" id="filter-All" class="px-3 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/40">All</button>
+          <button onclick="filterByTurtle('Turbo')" id="filter-Turbo" class="px-3 py-1 rounded text-slate-400 hover:text-white">Turbo</button>
+          <button onclick="filterByTurtle('Sneaky')" id="filter-Sneaky" class="px-3 py-1 rounded text-slate-400 hover:text-white">Sneaky</button>
+          <button onclick="filterByTurtle('Unassigned')" id="filter-Unassigned" class="px-3 py-1 rounded text-slate-400 hover:text-white">Night-Tank</button>
+        </div>
+      </div>
+
+      <!-- Feed Container -->
+      <div id="entries-container" class="space-y-3">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+  </main>
+
+  <!-- LOG ENTRY MODAL -->
+  <div id="modal-log-entry" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-panel bg-[#0d1612] border border-emerald-500/30 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b border-emerald-950/60 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="clipboard-edit" class="w-5 h-5 text-emerald-400"></i>
+          New Journal Observation
+        </h3>
+        <button onclick="closeModal('modal-log-entry')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-entry" class="space-y-4 text-xs font-mono">
+        <div>
+          <label class="block text-slate-400 mb-1">TARGET TURTLE / SUBJECT</label>
+          <select id="input-turtle" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+            <option value="Turbo">Turbo (EB-TRB-001)</option>
+            <option value="Sneaky">Sneaky (EB-SNK-001)</option>
+            <option value="Unassigned">Night-Tank Frame (EB-NGT-001)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">WATER TEMP (°F)</label>
+            <input type="number" step="0.1" id="input-water-temp" value="76.5" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">BASKING TEMP (°F)</label>
+            <input type="number" step="0.1" id="input-basking-temp" value="92.0" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">DIET / FOOD OFFERED</label>
+          <input type="text" id="input-diet" placeholder="e.g. Mazuri Pellets + Dandelion Greens" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">OBSERVATION NOTES (MARKDOWN)</label>
+          <textarea id="input-notes" rows="4" placeholder="Observed basking under UVB for 45 mins. Clean shell, eyes alert, active swimming..." class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-log-entry')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OBSIDIAN SYNC MODAL -->
+  <div id="modal-obsidian" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-panel bg-[#0d1612] border border-purple-500/30 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b border-purple-950/60 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-purple-400"></i>
+          Obsidian Vault Exporter (91_OBSIDIAN/journals)
+        </h3>
+        <button onclick="closeModal('modal-obsidian')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs font-mono">
+        <p class="text-slate-300">
+          Entries formatted with standard YAML frontmatter for automatic compatibility with your Obsidian vault located at:
+          <code class="text-purple-300 bg-purple-950/50 px-1.5 py-0.5 rounded">91_OBSIDIAN/journals/02 Entries/</code>
+        </p>
+
+        <div class="relative">
+          <pre id="obsidian-preview" class="w-full bg-[#070b09] border border-purple-900/40 rounded-xl p-4 text-purple-200 text-xs overflow-x-auto max-h-72"></pre>
+        </div>
+
+        <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+          <span id="copy-status" class="text-emerald-400 text-xs"></span>
+          <div class="flex space-x-2">
+            <button onclick="copyObsidianMarkdown()" class="px-4 py-2 rounded-lg bg-purple-900/40 border border-purple-500/40 hover:bg-purple-800/60 text-purple-200">
+              Copy to Clipboard
+            </button>
+            <button onclick="downloadObsidianMarkdown()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">
+              Download .md File
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-emerald-950/40 bg-[#0a100d] py-6 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div>
+        Red-Eared Slider Care &amp; Telemetry Journal &bull; Built for Vercel Serverless
+      </div>
+      <div class="flex items-center space-x-4">
+        <span>Morpheus Matrix PRoot</span>
+        <span class="text-slate-700">&bull;</span>
+        <span class="text-emerald-500">Vercel Ready</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
