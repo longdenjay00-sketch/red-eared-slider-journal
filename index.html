@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trachemys Journal | Red-Eared Slider Telemetry & Field Vault</title>
+  <title>Trachemys Care | Red-Eared Slider Care Reminders & Telemetry Hub</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -30,37 +30,55 @@
 <body class="bg-[#090d0b] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="border-b border-emerald-950/60 bg-[#0c1410]/80 backdrop-blur-md sticky top-0 z-40">
+  <header class="border-b border-emerald-950/60 bg-[#0c1410]/90 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <!-- Brand & Species -->
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-red-500/20 border border-emerald-500/30 flex items-center justify-center relative overflow-hidden">
-          <i data-lucide="shield" class="w-5 h-5 text-emerald-400"></i>
-          <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
+          <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+          <span class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
         </div>
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              Trachemys Journal
-              <span class="text-xs px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 border border-red-500/30 font-mono">RES-01</span>
+              Trachemys Care
+              <span class="text-xs px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 border border-red-500/30 font-mono">REMINDERS</span>
             </h1>
           </div>
           <p class="text-xs text-slate-400 font-mono">
-            Trachemys scripta elegans &bull; <span id="current-time">2026-11-09</span>
+            Red-Eared Slider Care &bull; <span id="current-time">2026-11-10</span>
           </p>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center space-x-3">
-        <button id="btn-export-obsidian" class="hidden sm:inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/40 text-purple-300 text-xs font-mono transition-colors">
-          <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
-          <span>Obsidian Sync</span>
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Due Tasks Pill -->
+        <div id="nav-due-pill" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-950/40 border border-amber-500/40 text-amber-300 text-xs font-mono cursor-pointer hover:bg-amber-900/50 transition" onclick="filterReminders('due')">
+          <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span id="nav-due-count" class="font-bold">0 Due</span>
+        </div>
+
+        <!-- Audio Toggle -->
+        <button id="btn-toggle-audio" onclick="toggleAudio()" title="Toggle Alert Sounds" class="p-2 rounded-lg border border-slate-800 bg-[#0d1612] hover:bg-slate-800 text-slate-300 text-xs font-mono transition">
+          <i id="audio-icon" data-lucide="volume-2" class="w-4 h-4 text-emerald-400"></i>
         </button>
 
-        <button id="btn-quick-log" class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all hover:scale-105 active:scale-95">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span>Log Observation</span>
+        <!-- New Reminder Button -->
+        <button onclick="openModal('modal-add-reminder')" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all hover:scale-105 active:scale-95">
+          <i data-lucide="alarm-clock" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Add Reminder</span>
+        </button>
+
+        <!-- Obsidian Sync -->
+        <button id="btn-export-obsidian" class="hidden md:inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/40 text-purple-300 text-xs font-mono transition">
+          <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
+          <span>Obsidian</span>
+        </button>
+
+        <!-- Backup / Settings -->
+        <button onclick="openModal('modal-backup')" class="p-2 rounded-lg border border-slate-800 bg-[#0d1612] hover:bg-slate-800 text-slate-400 hover:text-white transition" title="Backup & Vault Sync">
+          <i data-lucide="database" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
@@ -69,76 +87,115 @@
   <!-- MAIN CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- TURTLE ROSTER / PROFILES -->
-    <section class="space-y-3">
+    <!-- HERO REMINDER NOTIFICATION BANNER -->
+    <div id="urgent-banner" class="hidden glass-panel border-l-4 border-l-amber-500 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-950/30 via-transparent to-transparent">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+          <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-amber-200" id="urgent-banner-title">Care Protocols Require Attention</h2>
+          <p class="text-xs text-slate-300 font-mono" id="urgent-banner-desc">You have tasks due today to keep Turbo and Sneaky thriving.</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="requestNotificationPermission()" id="btn-enable-notify" class="text-xs font-mono px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+          Enable Browser Alarms
+        </button>
+        <button onclick="filterReminders('due')" class="text-xs font-mono px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold transition">
+          Review Due Tasks
+        </button>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS LAUNCHPAD -->
+    <section class="glass-panel rounded-xl p-4 space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-xs font-mono uppercase tracking-wider text-emerald-400/90 flex items-center gap-2">
-          <i data-lucide="users" class="w-3.5 h-3.5"></i>
-          Registered Animals &amp; Frames
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          1-Tap Quick Action Protocols
         </h2>
-        <span class="text-xs text-slate-400 font-mono">Vault Area: 91_OBSIDIAN/journals</span>
+        <span class="text-[11px] text-slate-400 font-mono">Instant logging &amp; cadence reset</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Turbo Card -->
-        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-emerald-500/50 transition" onclick="filterByTurtle('Turbo')">
-          <div class="flex justify-between items-start pl-2">
-            <div>
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">Turbo</span>
-              <h3 class="text-base font-bold text-white mt-1">Turbo The Turtle</h3>
-              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-TRB-001 &bull; Adult Female</p>
-            </div>
-            <div class="w-3 h-3 rounded-full bg-emerald-500 status-pulse"></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <!-- Quick Action: Morning Feed -->
+        <button onclick="quickActionComplete('feed')" class="flex items-center space-x-3 p-3 rounded-lg bg-[#0b1310] border border-emerald-900/30 hover:border-emerald-500/50 hover:bg-emerald-950/20 text-left transition group">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition">
+            <i data-lucide="utensils" class="w-4 h-4 text-emerald-400"></i>
           </div>
-          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
-            <div>
-              <span class="text-slate-500 block text-[10px]">DIET</span>
-              <span id="turbo-last-diet">Pellets + Kale</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
-              <span id="turbo-last-log">Today</span>
-            </div>
+          <div class="min-w-0">
+            <span class="text-xs font-bold text-slate-200 block truncate group-hover:text-emerald-300">Daily Feeding</span>
+            <span class="text-[10px] text-slate-400 font-mono block">Pellets + Greens</span>
+          </div>
+        </button>
+
+        <!-- Quick Action: Temp Check -->
+        <button onclick="quickActionComplete('temp')" class="flex items-center space-x-3 p-3 rounded-lg bg-[#0b1310] border border-amber-900/30 hover:border-amber-500/50 hover:bg-amber-950/20 text-left transition group">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center group-hover:scale-105 transition">
+            <i data-lucide="thermometer-sun" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs font-bold text-slate-200 block truncate group-hover:text-amber-300">Verify Temps</span>
+            <span class="text-[10px] text-slate-400 font-mono block">Water + Basking</span>
+          </div>
+        </button>
+
+        <!-- Quick Action: Water Change -->
+        <button onclick="quickActionComplete('water')" class="flex items-center space-x-3 p-3 rounded-lg bg-[#0b1310] border border-cyan-900/30 hover:border-cyan-500/50 hover:bg-cyan-950/20 text-left transition group">
+          <div class="w-9 h-9 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center group-hover:scale-105 transition">
+            <i data-lucide="droplets" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs font-bold text-slate-200 block truncate group-hover:text-cyan-300">Water Change</span>
+            <span class="text-[10px] text-slate-400 font-mono block">25% + Prime Dechlor</span>
+          </div>
+        </button>
+
+        <!-- Quick Action: Water Test -->
+        <button onclick="quickActionComplete('test')" class="flex items-center space-x-3 p-3 rounded-lg bg-[#0b1310] border border-purple-900/30 hover:border-purple-500/50 hover:bg-purple-950/20 text-left transition group">
+          <div class="w-9 h-9 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center group-hover:scale-105 transition">
+            <i data-lucide="flask-conical" class="w-4 h-4 text-purple-400"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs font-bold text-slate-200 block truncate group-hover:text-purple-300">Water Chem Test</span>
+            <span class="text-[10px] text-slate-400 font-mono block">pH, Ammonia 0 ppm</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- CARE REMINDERS HEADQUARTERS (PRIMARY FEATURE) -->
+    <section class="space-y-4">
+      <div class="flex flex-col md:flex-row justify-between md:items-center gap-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-red-400"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold tracking-wide text-white uppercase font-mono">Care Reminders &amp; Schedule</h2>
+            <p class="text-xs text-slate-400 font-mono">Species-Specific Protocols for Trachemys scripta elegans</p>
           </div>
         </div>
 
-        <!-- Sneaky Card -->
-        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-amber-500/50 transition" onclick="filterByTurtle('Sneaky')">
-          <div class="flex justify-between items-start pl-2">
-            <div>
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950/60 text-amber-400 border border-amber-500/30">Sneaky</span>
-              <h3 class="text-base font-bold text-white mt-1">Sneaky</h3>
-              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-SNK-001 &bull; 36 Titles</p>
-            </div>
-            <div class="w-3 h-3 rounded-full bg-amber-500 status-pulse"></div>
-          </div>
-          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
-            <div>
-              <span class="text-slate-500 block text-[10px]">DIET</span>
-              <span id="sneaky-last-diet">Duckweed</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
-              <span id="sneaky-last-log">Today</span>
-            </div>
-          </div>
+        <!-- Reminder Filter Tabs -->
+        <div class="flex items-center flex-wrap gap-1.5 bg-[#0e1713] p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <button onclick="filterReminders('all')" id="rf-all" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/40">All</button>
+          <button onclick="filterReminders('due')" id="rf-due" class="px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1">
+            <span>Due</span>
+            <span id="filter-due-badge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40">0</span>
+          </button>
+          <button onclick="filterReminders('daily')" id="rf-daily" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Daily</button>
+          <button onclick="filterReminders('weekly')" id="rf-weekly" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Weekly</button>
+          <button onclick="filterReminders('monthly')" id="rf-monthly" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Monthly</button>
+          <button onclick="filterReminders('Turbo')" id="rf-Turbo" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Turbo</button>
+          <button onclick="filterReminders('Sneaky')" id="rf-Sneaky" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Sneaky</button>
         </div>
+      </div>
 
-        <!-- Night-Tank Frame Card -->
-        <div class="glass-panel rounded-xl p-4 relative border border-slate-800/80 cursor-pointer hover:border-slate-600 transition" onclick="filterByTurtle('Unassigned')">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">Frame Frame</span>
-              <h3 class="text-base font-bold text-slate-200 mt-1">Night-Tank Frame</h3>
-              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-NGT-001 &bull; Unassigned</p>
-            </div>
-            <i data-lucide="camera" class="w-4 h-4 text-slate-500"></i>
-          </div>
-          <div class="mt-4 pt-3 border-t border-slate-800/80 text-xs font-mono text-slate-400">
-            <span class="text-slate-500 block text-[10px]">RECORD RULE</span>
-            <span>Awaiting visual observation tag</span>
-          </div>
-        </div>
+      <!-- Reminders Grid Container -->
+      <div id="reminders-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <!-- Rendered by app.js -->
       </div>
     </section>
 
@@ -208,16 +265,95 @@
         <div class="bg-[#0b1310]/90 border border-emerald-900/30 rounded-lg p-3.5 space-y-2">
           <div class="flex justify-between text-xs font-mono text-slate-400">
             <span>UVB 5.0 BULB</span>
-            <span class="text-emerald-400">Active</span>
+            <span class="text-purple-400" id="uvb-status-text">Active</span>
           </div>
           <div class="flex items-baseline space-x-2">
             <span id="telemetry-uvb-days" class="text-2xl font-bold font-mono text-purple-400">142</span>
             <span class="text-xs text-slate-400 font-mono">Days Left</span>
           </div>
           <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
-            <div class="bg-purple-500 h-1.5 rounded-full" style="width: 78%"></div>
+            <div id="telemetry-uvb-bar" class="bg-purple-500 h-1.5 rounded-full" style="width: 78%"></div>
           </div>
           <span class="text-[10px] text-slate-500 font-mono block">6-Month Swap Protocol</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TURTLE ROSTER / PROFILES -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-mono uppercase tracking-wider text-emerald-400/90 flex items-center gap-2">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          Registered Animals &amp; Habitats
+        </h2>
+        <span class="text-xs text-slate-400 font-mono">Vault Area: 91_OBSIDIAN/journals</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Turbo Card -->
+        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-emerald-500/50 transition" onclick="filterByTurtle('Turbo')">
+          <div class="flex justify-between items-start pl-2">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">Turbo</span>
+              <h3 class="text-base font-bold text-white mt-1">Turbo The Turtle</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-TRB-001 &bull; Adult Female</p>
+            </div>
+            <div class="w-3 h-3 rounded-full bg-emerald-500 status-pulse"></div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
+            <div>
+              <span class="text-slate-500 block text-[10px]">DIET</span>
+              <span id="turbo-last-diet">Pellets + Kale</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
+              <span id="turbo-last-log">Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sneaky Card -->
+        <div class="glass-panel slider-ear-stripe rounded-xl p-4 relative cursor-pointer hover:border-amber-500/50 transition" onclick="filterByTurtle('Sneaky')">
+          <div class="flex justify-between items-start pl-2">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950/60 text-amber-400 border border-amber-500/30">Sneaky</span>
+              <h3 class="text-base font-bold text-white mt-1">Sneaky</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">SKU: EB-SNK-001 &bull; 36 Titles</p>
+            </div>
+            <div class="w-3 h-3 rounded-full bg-amber-500 status-pulse"></div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 pl-2">
+            <div>
+              <span class="text-slate-500 block text-[10px]">DIET</span>
+              <span id="sneaky-last-diet">Duckweed</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[10px]">LAST LOG</span>
+              <span id="sneaky-last-log">Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Habitat Enclosure Card -->
+        <div class="glass-panel rounded-xl p-4 relative border border-slate-800/80 cursor-pointer hover:border-cyan-500/50 transition" onclick="filterByTurtle('Habitat')">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-500/30">Primary Tank</span>
+              <h3 class="text-base font-bold text-slate-200 mt-1">Aquaterrarium Habitat</h3>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">75 Gal &bull; Canister &bull; UVB 5.0</p>
+            </div>
+            <i data-lucide="waves" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs font-mono text-slate-400">
+            <div>
+              <span class="text-slate-500 block text-[10px]">LAST WATER CHANGE</span>
+              <span id="tank-last-water-change" class="text-cyan-300">3 days ago</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[10px]">CARE STREAK</span>
+              <span id="care-streak-display" class="text-emerald-400">5 Days 🔥</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -227,15 +363,19 @@
       <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <div class="flex items-center space-x-2">
           <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
-          <h2 class="text-sm font-semibold tracking-wide text-white uppercase font-mono">Journal Entries &amp; Care Logs</h2>
+          <h2 class="text-sm font-semibold tracking-wide text-white uppercase font-mono">Telemetry Log &amp; Observations</h2>
         </div>
 
-        <!-- Filters -->
+        <!-- Journal Filters -->
         <div class="flex items-center space-x-1.5 bg-[#0e1713] p-1 rounded-lg border border-slate-800 text-xs font-mono">
           <button onclick="filterByTurtle('All')" id="filter-All" class="px-3 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/40">All</button>
           <button onclick="filterByTurtle('Turbo')" id="filter-Turbo" class="px-3 py-1 rounded text-slate-400 hover:text-white">Turbo</button>
           <button onclick="filterByTurtle('Sneaky')" id="filter-Sneaky" class="px-3 py-1 rounded text-slate-400 hover:text-white">Sneaky</button>
-          <button onclick="filterByTurtle('Unassigned')" id="filter-Unassigned" class="px-3 py-1 rounded text-slate-400 hover:text-white">Night-Tank</button>
+          <button onclick="filterByTurtle('Habitat')" id="filter-Habitat" class="px-3 py-1 rounded text-slate-400 hover:text-white">Habitat</button>
+          <button onclick="openModal('modal-log-entry')" class="ml-2 px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Log</span>
+          </button>
         </div>
       </div>
 
@@ -246,7 +386,83 @@
     </section>
   </main>
 
-  <!-- LOG ENTRY MODAL -->
+  <!-- MODAL: ADD / EDIT CARE REMINDER -->
+  <div id="modal-add-reminder" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-panel bg-[#0d1612] border border-emerald-500/30 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b border-emerald-950/60 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="alarm-clock" class="w-5 h-5 text-emerald-400"></i>
+          Add Turtle Care Reminder
+        </h3>
+        <button onclick="closeModal('modal-add-reminder')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-reminder" class="space-y-4 text-xs font-mono">
+        <div>
+          <label class="block text-slate-400 mb-1">TASK TITLE</label>
+          <input type="text" id="rem-input-title" required placeholder="e.g. Shell Calcium Dusting or Filter Floss Swap" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">TARGET TURTLE / ASSET</label>
+            <select id="rem-input-target" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="Habitat">Habitat Tank (General)</option>
+              <option value="Turbo">Turbo (EB-TRB-001)</option>
+              <option value="Sneaky">Sneaky (EB-SNK-001)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">CADENCE / INTERVAL</label>
+            <select id="rem-input-interval" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="1">Daily (Every 24 hours)</option>
+              <option value="2">Every 2 Days (Adult Feeding)</option>
+              <option value="7" selected>Weekly (Every 7 days)</option>
+              <option value="14">Bi-Weekly (Every 14 days)</option>
+              <option value="30">Monthly (Filter / SCL)</option>
+              <option value="180">Every 6 Months (UVB Lamp)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">CARE CATEGORY</label>
+            <select id="rem-input-category" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="diet">Diet &amp; Nutrition</option>
+              <option value="water">Water &amp; Filtration</option>
+              <option value="lighting">UVB &amp; Thermal Lighting</option>
+              <option value="health">Shell &amp; Clinical Health</option>
+              <option value="hardware">Hardware &amp; Habitat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">PRIORITY</label>
+            <select id="rem-input-priority" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="critical">Critical (Health/Water)</option>
+              <option value="high" selected>High (Routine Care)</option>
+              <option value="routine">Routine</option>
+              <option value="periodic">Periodic Maintenance</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">CARE NOTES &amp; INSTRUCTIONS</label>
+          <textarea id="rem-input-desc" rows="3" placeholder="Specific dosages, water parameters, temperatures, or procedural steps..." class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-add-reminder')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Save Reminder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG JOURNAL ENTRY -->
   <div id="modal-log-entry" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
     <div class="glass-panel bg-[#0d1612] border border-emerald-500/30 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
       <div class="flex justify-between items-center border-b border-emerald-950/60 pb-3">
@@ -265,6 +481,7 @@
           <select id="input-turtle" class="w-full bg-[#080d0a] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500">
             <option value="Turbo">Turbo (EB-TRB-001)</option>
             <option value="Sneaky">Sneaky (EB-SNK-001)</option>
+            <option value="Habitat">Habitat Tank Enclosure</option>
             <option value="Unassigned">Night-Tank Frame (EB-NGT-001)</option>
           </select>
         </div>
@@ -298,7 +515,7 @@
     </div>
   </div>
 
-  <!-- OBSIDIAN SYNC MODAL -->
+  <!-- MODAL: OBSIDIAN SYNC -->
   <div id="modal-obsidian" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
     <div class="glass-panel bg-[#0d1612] border border-purple-500/30 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl relative">
       <div class="flex justify-between items-center border-b border-purple-950/60 pb-3">
@@ -336,14 +553,67 @@
     </div>
   </div>
 
+  <!-- MODAL: BACKUP & DATA MANAGEMENT -->
+  <div id="modal-backup" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-panel bg-[#0d1612] border border-cyan-500/30 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b border-cyan-950/60 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="database" class="w-5 h-5 text-cyan-400"></i>
+          Data Vault Backup &amp; Storage
+        </h3>
+        <button onclick="closeModal('modal-backup')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs font-mono">
+        <p class="text-slate-300">
+          All care schedules, intervals, and observations are saved locally in your browser storage. You can export a snapshot to your Johnny Decimal system or import an existing vault.
+        </p>
+
+        <div class="p-3 bg-[#080d0a] border border-slate-800 rounded-lg space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Total Reminders:</span>
+            <span id="backup-rem-count" class="text-white font-bold">12</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Total Log Entries:</span>
+            <span id="backup-log-count" class="text-white font-bold">3</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="exportVaultBackup()" class="p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/40 hover:bg-cyan-900/60 text-cyan-200 text-center font-bold transition">
+            Export JSON Snapshot
+          </button>
+          <label class="p-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-center font-bold cursor-pointer transition flex items-center justify-center">
+            Import JSON Backup
+            <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importVaultBackup(event)">
+          </label>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+          <button onclick="resetDefaults()" class="text-red-400 hover:text-red-300 text-[11px]">
+            Reset to Species Defaults
+          </button>
+          <button onclick="closeModal('modal-backup')" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
-  <footer class="border-t border-emerald-950/40 bg-[#0a100d] py-6 text-center text-xs font-mono text-slate-500">
+  <footer class="border-t border-emerald-950/40 bg-[#0a100d] py-6 text-center text-xs font-mono text-slate-500 mt-8">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
       <div>
-        Red-Eared Slider Care &amp; Telemetry Journal &bull; Built for Vercel Serverless
+        Red-Eared Slider Care Reminder &amp; Telemetry Hub &bull; Built for Vercel Deployment
       </div>
       <div class="flex items-center space-x-4">
-        <span>Morpheus Matrix PRoot</span>
+        <span>Turbo &amp; Sneaky</span>
+        <span class="text-slate-700">&bull;</span>
+        <span>Morpheus Matrix</span>
         <span class="text-slate-700">&bull;</span>
         <span class="text-emerald-500">Vercel Ready</span>
       </div>
