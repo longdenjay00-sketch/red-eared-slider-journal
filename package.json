@@ -4,8 +4,9 @@
   "description": "Trachemys Care — Red-Eared Slider (Trachemys scripta elegans) Care Reminders, Habitat Telemetry & Journal for Vercel",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve -l 3000 .",
-    "dev": "npx serve -l 3000 .",
+    "start": "npx serve -s -l 3000 .",
+    "dev": "npx serve -s -l 3000 .",
+    "serve:py": "python3 -m http.server 3000",
     "deploy": "vercel",
     "deploy:prod": "vercel --prod"
   },
