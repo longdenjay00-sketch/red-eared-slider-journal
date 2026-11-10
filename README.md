@@ -1,5 +1,7 @@
 # Trachemys Care — Red-Eared Slider Care Reminders & Telemetry Hub
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/longdenjay00-sketch/red-eared-slider-journal)
+
 A specialized web application for tracking and scheduling the care, health routines, habitat telemetry, and observations of Red-Eared Sliders (*Trachemys scripta elegans*), specifically tailored for Turbo and Sneaky, with full integration to the Johnny Decimal Obsidian Vault (`91_OBSIDIAN/journals`) and pre-configured for instant **Vercel** serverless deployment.
 
 ---
